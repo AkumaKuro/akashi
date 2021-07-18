@@ -6,6 +6,8 @@ class PacketHDID : public AOPacket
 {
     PacketHDID(QStringList p_contents);
 
-    /// Implements [hardware ID](https://github.com/AttorneyOnline/docs/blob/master/docs/development/network.md#hard-drive-id).
+    /**
+     * @brief Implements [hardware ID](https://github.com/AttorneyOnline/docs/blob/master/docs/development/network.md#hard-drive-id).
+     */
     virtual void handlePacket(AreaData* area, AOClient& client);
 };

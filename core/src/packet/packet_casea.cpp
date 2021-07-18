@@ -1,3 +1,4 @@
+#include "include/packet/packet_casea.h"
 void AOClient::pktAnnounceCase(AreaData* area, int argc, QStringList argv, AOPacket packet)
 {
     QString case_title = argv[0];
@@ -37,3 +38,19 @@ void AOClient::pktAnnounceCase(AreaData* area, int argc, QStringList argv, AOPac
         // at least 7 arguments despite only using the first 6. Cera, i kneel. you have truly broken me.
     }
 }
+
+PacketCASEA::PacketCASEA(QStringList p_contents)
+    : AOPacket(p_contents)
+{
+    header = "CASEA";
+    acl_mask = ACLFlags.value("NONE");
+    min_args = 7; //the AO microcosm where a thing that only takes six arguments needs seven.
+
+    case_title = p_contents[0];
+}
+
+void PacketCASEA::handlePacket(AreaData *area, AOClient &client)
+{
+
+}
+

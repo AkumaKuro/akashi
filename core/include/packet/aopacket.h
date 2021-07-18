@@ -40,7 +40,7 @@ class AOPacket {
      * @param p_header The header for the packet.
      * @param p_contents The contents of the packet.
      */
-    AOPacket(QStringList p_contents);
+    explicit AOPacket(QStringList p_contents);
 
     /**
      * @brief Returns the string representation of the packet.
