@@ -42,7 +42,7 @@ bool ConfigManager::verifyServerConfig()
     // Verify config files
     QStringList l_config_files{"config/config.ini", "config/areas.ini", "config/backgrounds.txt", "config/characters.txt", "config/music.json",
                                "config/discord.ini", "config/text/8ball.txt", "config/text/gimp.txt", "config/text/praise.txt",
-                               "config/text/reprimands.txt","config/text/commandhelp.json"};
+                               "config/text/reprimands.txt","config/text/commandhelp.json","config/text/cdns.txt"};
     for (const QString &l_file : l_config_files) {
         if (!fileExists(QFileInfo(l_file))) {
             qCritical() << l_file + " does not exist!";
@@ -92,6 +92,7 @@ bool ConfigManager::verifyServerConfig()
     m_commands->praises = (loadConfigFile("praise"));
     m_commands->reprimands = (loadConfigFile("reprimands"));
     m_commands->gimps = (loadConfigFile("gimp"));
+    m_commands->cdns = (loadConfigFile("cdns"));
 
     m_uptimeTimer->start();
 
@@ -600,6 +601,11 @@ ConfigManager::help ConfigManager::commandHelp(QString f_command_name)
 void ConfigManager::setMotd(const QString f_motd)
 {
     m_settings->setValue("Options/motd", f_motd);
+}
+
+QStringList ConfigManager::approvedCDNs()
+{
+    return m_commands->cdns;
 }
 
 bool ConfigManager::fileExists(const QFileInfo &f_file)

@@ -20,6 +20,15 @@ public:
      */
     AreaData* m_area;
 
+    /**
+     * @brief A small musiclist to test with.
+     */
+    QStringList serverMusic = {
+        "==Music==",
+        "Announce The Truth (AA)",
+        "Announce The Truth (AJ)"
+    };
+
 private slots:
     /**
      * @brief Initialises every tests with creating a new area with the title "Test Area", and the index of 0.
@@ -61,12 +70,40 @@ private slots:
      */
     void changeCharacter();
 
+    /**
+     * @brief Tests entire testimony recorder.
+     */
     void testimony();
+
+    /**
+     * @brief Tests the area jukebox.
+     */
+    void jukebox();
+
+    /**
+     * @brief The data function for validateCustomSong()
+     */
+    void validateCustomSong_data();
+
+    /**
+     * @brief Tests validation of custom song candidates.
+     */
+    void validateCustomSong();
+
+    /**
+     * @brief The data function for customCategory()
+     */
+    void addCustomCategory_data();
+
+    /**
+     * @brief Tests the addition of categories into the custom musiclist.
+     */
+    void addCustomCategory();
 };
 
 void Area::init()
 {
-    m_area = new AreaData("Test Area", 0);
+    m_area = new AreaData("Test Area", 0 ,&serverMusic);
 }
 
 void Area::cleanup()
@@ -243,6 +280,58 @@ void Area::testimony()
         QCOMPARE(l_results.first, l_testimony.at(1));
         QCOMPARE(l_results.second, AreaData::TestimonyProgress::STAYED_AT_FIRST);
     }
+}
+
+void Area::jukebox()
+{
+    QCOMPARE(1,1);
+}
+
+void Area::validateCustomSong_data()
+{
+    //Songname can also be the realname.
+    QTest::addColumn<QString>("songname");
+    QTest::addColumn<bool>("expectedResult");
+
+    QTest::addRow("Songname - No extension") << "Announce The Truth (AA)" << false;
+    QTest::addRow("Songname - Valid Extension") << "Announce The Truth (AA).opus" << true;
+    QTest::addRow("Songname - Invalid Extension") << "Announce The Truth (AA).aac" << false;
+    QTest::addRow("URL - Valid primary") << "https://my.cdn.com/mysong.opus" << true;
+    QTest::addRow("URL - Valid secondary") << "https://your.cdn.com/mysong.opus" << true;
+    QTest::addRow("URL - Invalid extension") << "https://my.cdn.com/mysong.aac." << false;
+    QTest::addRow("URL - Invalid prefix") << "ftp://my.cdn.com/mysong.opus" << false;
+    QTest::addRow("URL - Invalid missing prefix") << "my.cdn.com/mysong.opus" << false;
+    QTest::addRow("URL - Invalid CDN") << "https://myipgrabber.com/mysong.opus" << false;
+    QTest::addRow("URL - Subdomain Attack") << "https://my.cdn.com.fakedomain.com/mysong.opus" << false;
+}
+
+void Area::validateCustomSong()
+{
+    QFETCH(QString,songname);
+    QFETCH(bool,expectedResult);
+
+    bool l_result = m_area->validateCustomSong(songname, {"my.cdn.com","your.cdn.com"});
+    QCOMPARE(expectedResult,l_result);
+}
+
+void Area::addCustomCategory_data()
+{
+    QTest::addColumn<QString>("category");
+    QTest::addColumn<QStringList>("expectedCustomlist");
+    QTest::addColumn<bool>("globalEnabled");
+
+    QTest::addRow("Invalid - Same as main") << "Music" << QStringList{} << true;
+}
+
+void Area::addCustomCategory()
+{
+    QFETCH(QString,category);
+    QFETCH(QStringList,expectedCustomlist);
+    QFETCH(bool,globalEnabled);
+
+    if(m_area->globalListEnabled() != globalEnabled)
+
+    m_area->addCustomCategory(category);
 }
 
 }

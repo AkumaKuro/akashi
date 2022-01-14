@@ -20,7 +20,7 @@
 
 #include "include/area_data.h"
 
-AreaData::AreaData(QString p_name, int p_index) :
+AreaData::AreaData(QString p_name, int p_index, const QStringList *f_music_list) :
     m_index(p_index),
     m_playerCount(0),
     m_status(IDLE),
@@ -51,6 +51,8 @@ AreaData::AreaData(QString p_name, int p_index) :
     m_shownameAllowed = areas_ini->value("shownames_allowed", "true").toBool();
     m_ignoreBgList = areas_ini->value("ignore_bglist", "false").toBool();
     m_jukebox = areas_ini->value("jukebox_enabled", "false").toBool();
+    p_musiclist = f_music_list;
+    m_approved_cdns = ConfigManager::approvedCDNs();
     areas_ini->endGroup();
     QTimer* timer1 = new QTimer();
     m_timers.append(timer1);
@@ -567,7 +569,7 @@ QString AreaData::addJukeboxSong(QString f_song)
             if (l_song.second > 0) {
                 if (m_jukebox_queue.size() == 0) {
 
-                    emit playJukeboxSong(AOPacket("MC",{l_song.first,QString::number(-1)}), index());
+                    emit sendAreaPacket(AOPacket("MC",{l_song.first,QString::number(-1)}), index());
                     m_jukebox_timer->start(l_song.second * 1000);
                     setCurrentMusic(f_song);
                     setMusicPlayedBy("Jukebox");
@@ -582,13 +584,155 @@ QString AreaData::addJukeboxSong(QString f_song)
     return "Unable to add song. Song already in Jukebox.";
 }
 
+void AreaData::toggleGlobalMusiclist()
+{
+    global_musiclist_enabled = !global_musiclist_enabled;
+    if (global_musiclist_enabled) {
+        //Clear entire custom list in order to prevent name duplicates.
+        m_custom_music.clear();
+    }
+}
+
+void AreaData::addCustomCategory(QString f_category)
+{
+    //Category need at least two == to be recognised as such. Add if not in the name.
+    //Move me to the command!
+    QString l_category = f_category;
+    if (!f_category.startsWith("==")) {
+        l_category =  "==" + l_category + "==";
+    }
+
+    //Avoid conflicts by checking if it exits.
+    if (p_musiclist->contains(l_category) && global_musiclist_enabled) {
+        return;
+    }
+
+    if (m_custom_music.contains(l_category)) {
+        return;
+    }
+
+    //List is empty. We can safely insert it.
+    if (m_custom_music.isEmpty()) {
+        m_custom_music.insert(l_category,{l_category,0});
+        return;
+    }
+    else {
+        if (m_custom_music.firstKey().startsWith("==")){
+            m_custom_music.insert(l_category,{l_category,0});
+            return;
+        }
+
+        //Copy the current custom list into temporary container to prepend category.
+        QMap<QString,QPair<QString, float>> l_custom_music;
+        l_custom_music.insert(l_category,{l_category,0});
+        for (auto iterator = m_custom_music.keyValueBegin(), end = m_custom_music.keyValueEnd(); iterator != end; ++iterator){
+            l_custom_music.insert({iterator.operator*()});
+        }
+        m_custom_music = l_custom_music;
+    }
+}
+
+void AreaData::addCustomSong(QString f_songname, QString f_realname, float f_duration)
+{
+    //Validate if simple name.
+    QString l_songname = f_songname;
+    if (f_songname.split(".").size() == 1) {
+        l_songname = l_songname + ".opus";
+    }
+
+    QStringList l_cdns = ConfigManager::approvedCDNs();
+    if (!(validateCustomSong(l_songname, l_cdns) && validateCustomSong(f_realname, l_cdns))) {
+        return;
+    }
+
+    //Avoid conflicts by checking if it exits.
+    if (p_musiclist->contains(f_songname) && global_musiclist_enabled) {
+        return;
+    }
+
+    if (m_custom_music.contains(f_songname)) {
+        return;
+    }
+
+    m_custom_music.insert(f_songname,{f_realname,f_duration});
+}
+
+void AreaData::removeCategory(QString f_category)
+{
+    if (m_custom_music.contains(f_category)) {
+        m_custom_music.remove(f_category);
+    }
+}
+
+void AreaData::removeCustomSong(QString f_songname)
+{
+    if (m_custom_music.contains(f_songname)) {
+        m_custom_music.remove(f_songname);
+    }
+}
+
+void AreaData::sendMusicList(int f_client_id)
+{
+    if (global_musiclist_enabled) {
+        //Prepend global music list to custom list.
+        emit sendAreaPacketToID(AOPacket("FM",{*p_musiclist + m_custom_music.keys()}), f_client_id);
+        return;
+    }
+    emit sendAreaPacketToID(AOPacket("FM",{m_custom_music.keys()}), f_client_id);
+}
+
+bool AreaData::validateCustomSong(QString f_custom_song, QStringList f_approved_cdns)
+{
+    QStringList l_extensions = {".opus", ".ogg", ".mp3", ".wav" };
+
+    bool l_cdn_approved = false;
+    //Check if URL formatted.
+    if (f_custom_song.contains("/")) {
+        //Only allow HTTPS sources.
+        if (f_custom_song.startsWith("https://")) {
+            for (const QString &l_cdn : qAsConst(f_approved_cdns)) {
+                //Iterate trough all available CDNs to find an approved match
+                if (f_custom_song.startsWith("https://" + l_cdn + "/", Qt::CaseInsensitive)) {
+                    l_cdn_approved = true;
+                    break;
+                }
+            }
+            if (!l_cdn_approved) {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
+    bool l_suffix_found = false;;
+    for (const QString &suffix : qAsConst(l_extensions)) {
+        if (f_custom_song.endsWith(suffix)){
+            l_suffix_found = true;
+            break;
+        }
+    }
+
+    if (!l_suffix_found) {
+        return false;
+    }
+
+    return true;
+}
+
+bool AreaData::globalListEnabled() const
+{
+    return global_musiclist_enabled;
+}
+
 void AreaData::switchJukeboxSong()
 {
     QString l_song_name;
     if(m_jukebox_queue.size() == 1) {
         l_song_name = m_jukebox_queue[0];
         QPair<QString,float> l_song = ConfigManager::songInformation(l_song_name);
-        emit playJukeboxSong(AOPacket("MC",{l_song.first,"-1"}), m_index);
+        emit sendAreaPacket(AOPacket("MC",{l_song.first,"-1"}), m_index);
         m_jukebox_timer->start(l_song.second * 1000);
     }
     else {
@@ -596,7 +740,7 @@ void AreaData::switchJukeboxSong()
         l_song_name = m_jukebox_queue[l_random_index];
 
         QPair<QString,float> l_song = ConfigManager::songInformation(l_song_name);
-        emit playJukeboxSong(AOPacket("MC",{l_song.first,"-1"}), m_index);
+        emit sendAreaPacket(AOPacket("MC",{l_song.first,"-1"}), m_index);
         m_jukebox_timer->start(l_song.second * 1000);
 
         m_jukebox_queue.remove(l_random_index);

@@ -469,6 +469,11 @@ class ConfigManager {
     static void setMotd(const QString f_motd);
 
     /**
+     * @brief Returns a list of all approved CDNs on this server.
+     */
+    static QStringList approvedCDNs();
+
+    /**
      * @brief Reload the server configuration.
      */
     static void reloadSettings();
@@ -500,6 +505,7 @@ private:
         QStringList praises; //!< Contains command praises, found in config/text/praises.txt
         QStringList reprimands; //!< Contains command reprimands, found in config/text/reprimands.txt
         QStringList gimps; //!< Contains phrases for /gimp, found in config/text/gimp.txt
+        QStringList cdns; //!< Contains cdns for dynamic musiclist, found in config/text/cdns.txt
     };
 
     /**

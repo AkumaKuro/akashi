@@ -140,11 +140,11 @@ class Server : public QObject {
     void broadcast(AOPacket packet);
 
     /**
-     * @brief Sends a packet to clients, sends an altered packet to a specific usergroup.
+     * @brief Sends a packet to a specific usergroup.
      *
      * @param The packet to send to the clients.
      *
-     * @param ENUM to determine the targets of the altered packet.
+     * @param ENUM to determine the targets.
      */
     void broadcast(AOPacket packet, TARGET_TYPE target);
 
@@ -158,6 +158,15 @@ class Server : public QObject {
      * @param ENUM to determine the targets of the altered packet.
      */
     void broadcast(AOPacket packet, AOPacket other_packet, enum TARGET_TYPE target);
+
+    /**
+     * @brief Sends a packet to a single client.
+     *
+     * @param The packet send to the client.
+     *
+     * @param The temporary userID of the client.
+     */
+    void unicast(AOPacket f_packet, int f_client_id);
 
     /**
      * @brief Returns the character's character ID (= their index in the character list).

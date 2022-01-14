@@ -44,7 +44,7 @@ class AreaData : public QObject {
      * and `YYYYYY` is the actual name of the area.
      * @param p_index The index of the area in the area list.
      */
-    AreaData(QString p_name, int p_index);
+    AreaData(QString p_name, int p_index, const QStringList *f_music_list);
 
     /**
      * @brief The data for evidence in the area.
@@ -844,6 +844,50 @@ class AreaData : public QObject {
      */
     QString addJukeboxSong(QString f_song);
 
+    //Dynamic musiclist
+
+    /**
+     * @brief Toggles wether the global music list being included or not.
+     */
+    void toggleGlobalMusiclist();
+
+    /**
+     * @brief Adds a category to the dynamic musiclist.
+     */
+    void addCustomCategory(QString f_category);
+
+    /**
+     * @brief Adds an alias, song and duration to the custom musiclist.
+     * Note not all of these are necessary and would invoke defaults
+     */
+    void addCustomSong(QString f_songname, QString f_realname, float f_duration);
+
+    /**
+     * @brief Removes a Category from the custom musiclist.
+     */
+    void removeCategory(QString f_category);
+
+    /**
+     * @brief Removes the song from the custom music list.
+     */
+    void removeCustomSong(QString f_songname);
+
+    /**
+     * @brief Sends the area music list to the client.
+     */
+    void sendMusicList(int f_client_id);
+
+    /**
+     * @brief Validates if a custom song can be added to the area custom musiclist.
+     *
+     * @param Name of the custom song. May also be the realname of an aliased song.
+     *
+     * @return Returns true if song is valid to be entered into the musiclist.
+     */
+    bool validateCustomSong(QString f_custom_song, QStringList f_approved_cdns);
+
+    bool globalListEnabled() const;
+
 public slots:
 
     /**
@@ -854,9 +898,14 @@ public slots:
   signals:
 
     /**
-     * @brief Changes the song in the current area when the jukebox timer expires.
+     * @brief Signal to send packets as the area to itself or other areas.
      */
-    void playJukeboxSong(AOPacket f_packet, int f_area_index);
+    void sendAreaPacket(AOPacket f_packet, int f_area_index);
+
+    /**
+     * @brief Signal to send packets to a specific client.
+     */
+    void sendAreaPacketToID(AOPacket f_packet, int f_user_id);
 
 private:
     /**
@@ -1060,6 +1109,21 @@ private:
      */
     bool m_send_area_message;
 
+    /**
+     * @brief Pointer to the server musiclist.
+     */
+    const QStringList* p_musiclist;
+
+    /**
+     * @brief Contains all "custom" music added to the area.
+     */
+    QMap<QString,QPair<QString,float>> m_custom_music;
+
+    /**
+     * @brief Controls if only the custom songs are send or the global list is prepended.
+     */
+    bool global_musiclist_enabled;
+
     // Jukebox specific members
     /**
      * @brief Stores the songs added to the jukebox to be played.
@@ -1081,6 +1145,8 @@ private:
      * @brief Wether or not the jukebox is enabled in this area.
      */
     bool m_jukebox;
+
+    QStringList m_approved_cdns;
 };
 
 #endif // AREA_DATA_H
