@@ -30,6 +30,7 @@ AreaData::AreaData(QString p_name, int p_index, MusicManager* p_music_manager = 
     m_area_message("No area message set."),
     m_defHP(10),
     m_proHP(10),
+    m_currentMusic("~stop.mp3"),
     m_statement(0),
     m_judgelog(),
     m_lastICMessage(),
@@ -98,6 +99,10 @@ void AreaData::clientJoinedArea(int f_charId, int f_userId)
     //The name will never be shown as we are using a spectator ID. Still nice for people who network sniff.
     //We auto-loop this so you'll never sit in silence unless wanted.
     emit sendAreaPacketClient(AOPacket("MC",{m_currentMusic, QString::number(-1), ConfigManager::serverName(), QString::number(1)}), f_userId);
+
+    if (sendAreaMessageOnJoin()) {
+        emit sendAreaPacketClient(AOPacket("CT", {ConfigManager::serverName(), m_area_message, "1"}), f_userId);
+    }
 }
 
 QList<int> AreaData::owners() const
