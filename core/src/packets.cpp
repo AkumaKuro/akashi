@@ -210,7 +210,7 @@ void AOClient::pktIcChat(AreaData *area, int argc, QStringList argv, AOPacket pa
         return;
     }
 
-    if (!!area->isMessageAllowed() || !server->isMessageAllowed()) {
+    if (!area->isMessageAllowed() || !server->isMessageAllowed()) {
         return;
     }
 
