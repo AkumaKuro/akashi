@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMMAND_EXTENSION_H
+#define COMMAND_EXTENSION_H
 
 #include <QMap>
 #include <QObject>
@@ -194,3 +195,5 @@ class CommandExtensionCollection : public QObject
      */
     QMap<QString, CommandExtension> m_extensions;
 };
+
+#endif // COMMAND_EXTENSION_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AKASHIDEFS_H
+#define AKASHIDEFS_H
 
 #include <QString>
 #include <qnamespace.h>
@@ -12,3 +13,5 @@ using SplitBehavior = Qt::SplitBehaviorFlags;
 const SplitBehavior KeepEmptyParts = SplitBehavior::KeepEmptyParts;
 const SplitBehavior SkipEmptyParts = SplitBehavior::SkipEmptyParts;
 }
+
+#endif // AKASHIDEFS_H
