@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QSettings>
 
+#include "include/akashidefs.h"
+
 CommandExtension::CommandExtension() {}
 
 CommandExtension::CommandExtension(QString f_command_name)
@@ -133,7 +135,7 @@ bool CommandExtensionCollection::loadFile(QString f_filename)
 
         l_settings.beginGroup(i_group);
 
-        QStringList l_aliases = l_settings.value("aliases").toString().split(" ", Qt::SkipEmptyParts);
+        QStringList l_aliases = l_settings.value("aliases").toString().split(" ", akashi::SkipEmptyParts);
         for (QString &i_alias : l_aliases) {
             i_alias = i_alias.toLower();
         }
@@ -149,7 +151,7 @@ bool CommandExtensionCollection::loadFile(QString f_filename)
 
         CommandExtension l_extension(l_command_name);
         l_extension.setAliases(l_aliases);
-        l_extension.setPermissionsByCaption(l_settings.value("permissions").toString().split(" ", Qt::SkipEmptyParts));
+        l_extension.setPermissionsByCaption(l_settings.value("permissions").toString().split(" ", akashi::SkipEmptyParts));
         m_extensions.insert(l_command_name, std::move(l_extension));
 
         l_settings.endGroup();

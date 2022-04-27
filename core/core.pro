@@ -54,6 +54,7 @@ SOURCES += \
 
 HEADERS += include/aoclient.h \
     include/acl_roles_handler.h \
+    include/akashidefs.h \
     include/aopacket.h \
     include/area_data.h \
     include/command_extension.h \
