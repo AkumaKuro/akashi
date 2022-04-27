@@ -17,8 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////////////
 #include "include/aoclient.h"
 
-#include <QTcpSocket>
-
 #include "include/area_data.h"
 #include "include/command_extension.h"
 #include "include/config_manager.h"
@@ -210,11 +208,16 @@ void AOClient::cmdHelp(int argc, QStringList argv)
 
 void AOClient::cmdMOTD(int argc, QStringList argv)
 {
+    Q_UNUSED(argc)
+    Q_UNUSED(argv)
+
     sendServerMessage("=== MOTD ===\r\n" + ConfigManager::motd() + "\r\n=============");
 }
 
 void AOClient::cmdSetMOTD(int argc, QStringList argv)
 {
+    Q_UNUSED(argc)
+
     QString l_MOTD = argv.join(" ");
     ConfigManager::setMotd(l_MOTD);
     sendServerMessage("MOTD has been changed.");
