@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QObject>
 #include <QString>
+#include <QVector>
 
 #include "include/acl_roles_handler.h"
 
