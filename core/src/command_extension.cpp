@@ -46,7 +46,7 @@ void CommandExtension::setAliases(QStringList f_aliases)
 
 QVector<ACLRole::Permission> CommandExtension::getPermissions() const
 {
-    return getPermissions({});
+    return getPermissions(QVector<ACLRole::Permission>{});
 }
 
 void CommandExtension::setPermissions(QVector<ACLRole::Permission> f_permissions)
