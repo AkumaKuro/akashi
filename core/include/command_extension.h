@@ -68,10 +68,7 @@ class CommandExtension
      *
      * @param f_defaultPermissions A list of permissions to return if the extensions's permissions are not set or empty.
      */
-    QVector<ACLRole::Permission> getPermissions(QVector<ACLRole::Permission> f_defaultPermissions) const
-    {
-        return m_permissions.isEmpty() ? f_defaultPermissions : m_permissions;
-    }
+    QVector<ACLRole::Permission> getPermissions(QVector<ACLRole::Permission> f_defaultPermissions) const;
 
     /**
      * @brief Returns the list of permissions.

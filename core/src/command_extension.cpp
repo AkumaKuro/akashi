@@ -44,6 +44,11 @@ void CommandExtension::setAliases(QStringList f_aliases)
     updateMergedAliases();
 }
 
+QVector<ACLRole::Permission> CommandExtension::getPermissions(QVector<ACLRole::Permission> f_defaultPermissions) const
+{
+    return m_permissions.isEmpty() ? f_defaultPermissions : m_permissions;
+}
+
 QVector<ACLRole::Permission> CommandExtension::getPermissions() const
 {
     return getPermissions(QVector<ACLRole::Permission>{});
