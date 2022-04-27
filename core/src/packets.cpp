@@ -19,10 +19,10 @@
 
 #include <QQueue>
 
+#include "include/akashidefs.h"
 #include "include/aopacket.h"
 #include "include/area_data.h"
 #include "include/config_manager.h"
-#include "include/akashidefs.h"
 #include "include/db_manager.h"
 #include "include/music_manager.h"
 #include "include/server.h"
