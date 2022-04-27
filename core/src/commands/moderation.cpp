@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////////////
 #include "include/aoclient.h"
 
+#include <QTcpSocket>
+
 #include "include/area_data.h"
 #include "include/command_extension.h"
 #include "include/config_manager.h"
