@@ -22,12 +22,5 @@ Requires Qt >= 5.10, and Qt websockets
    qmake && make
 ```
 
-# Major Contributors
-
-|Name|Contribution years|
-| --- | --- |
-|Scatterflower| 2020 - 2022|
-|in1tiate| 2021-2022|
-|Cerapter| 2021-2022|
-|mangosarentliterature| 2021-2022|
-|Salanto| 2021-2022|
+# Contributors
+![GitHub Contributors Image](https://contrib.rocks/image?repo=AttorneyOnline/akashi)
