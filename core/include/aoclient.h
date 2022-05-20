@@ -33,6 +33,8 @@
 #include "include/acl_roles_handler.h"
 #include "include/aopacket.h"
 
+#define SPECTATOR -1
+
 class AreaData;
 class DBManager;
 class MusicManager;
@@ -317,6 +319,11 @@ class AOClient : public QObject
     bool m_is_logging_in = false;
 
     /**
+     * @brief If true, the client is a spectator and his IC interactions will be limtied.
+     */
+    bool m_is_spectator = false;
+
+    /**
      * @brief Checks if the client's ACL role has permission for the given permission.
      *
      * @param f_permission The permission flags.
@@ -325,7 +332,20 @@ class AOClient : public QObject
      */
     bool checkPermission(ACLRole::Permission f_permission) const;
 
-  public slots:
+    /**
+     * @brief Returns if the client is a spectator.
+     *
+     * @return True if the client is a spectator, false otherwise.
+     */
+    bool isSpectator() const;
+
+    /**
+     * @brief Sets the spectator state for the client.
+     * @param f_spectator
+     */
+    void setSpectator(bool f_spectator);
+
+public slots:
     /**
      * @brief A slot for when the client disconnects from the server.
      */

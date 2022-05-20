@@ -518,6 +518,16 @@ bool AOClient::isAuthenticated() const
 
 Server *AOClient::getServer() { return server; }
 
+void AOClient::setSpectator(bool f_spectator)
+{
+    m_is_spectator = f_spectator;
+}
+
+bool AOClient::isSpectator() const
+{
+    return m_is_spectator;
+}
+
 void AOClient::onAfkTimeout()
 {
     if (!m_is_afk)
