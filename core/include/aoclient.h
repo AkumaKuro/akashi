@@ -345,7 +345,7 @@ class AOClient : public QObject
      */
     void setSpectator(bool f_spectator);
 
-public slots:
+  public slots:
     /**
      * @brief A slot for when the client disconnects from the server.
      */
