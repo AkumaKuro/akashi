@@ -303,6 +303,8 @@ bool AOClient::changeCharacter(int char_id)
 
     if (char_id < 0) {
         m_current_char = "";
+        m_char_id = char_id;
+        setSpectator(true);
     }
 
     if (l_successfulChange == true) {

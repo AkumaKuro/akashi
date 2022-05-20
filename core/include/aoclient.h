@@ -33,8 +33,6 @@
 #include "include/acl_roles_handler.h"
 #include "include/aopacket.h"
 
-#define SPECTATOR -1
-
 class AreaData;
 class DBManager;
 class MusicManager;
@@ -341,9 +339,20 @@ class AOClient : public QObject
 
     /**
      * @brief Sets the spectator state for the client.
+     *
      * @param f_spectator
      */
     void setSpectator(bool f_spectator);
+
+    /**
+     * @brief The spectator character ID
+     *
+     * @details You may assume that AO has a sane way to determine if a user is a spectator
+     * or an actual player. Well, to nobodys surprise, this is not the case, so the character id -1 is used
+     * to determine if a client has entered spectator or user mode. I am making this a const mostly
+     * for the case this could change at some point in the future, but don't count on it.
+     */
+    const int SPECTATOR_ID = -1;
 
   public slots:
     /**

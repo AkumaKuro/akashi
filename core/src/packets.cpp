@@ -194,16 +194,13 @@ void AOClient::pktSelectChar(AreaData *area, int argc, QStringList argv, AOPacke
     bool argument_ok;
     int l_selected_char_id = argv[1].toInt(&argument_ok);
     if (!argument_ok) {
-        l_selected_char_id = SPECTATOR;
+        l_selected_char_id = SPECTATOR_ID;
     }
 
     if (changeCharacter(l_selected_char_id))
         m_char_id = l_selected_char_id;
 
-    if (m_char_id == SPECTATOR) {
-        setSpectator(true);
-    }
-    else {
+    if (m_char_id > SPECTATOR_ID) {
         setSpectator(false);
     }
 }
