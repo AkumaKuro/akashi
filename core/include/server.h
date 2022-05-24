@@ -28,6 +28,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
+#include <QWebSocketServer>
 
 #include "include/aopacket.h"
 
@@ -402,16 +403,14 @@ class Server : public QObject
 
   private:
     /**
-     * @brief The proxy used for WebSocket connections.
-     *
-     * @see WSProxy and WSClient for an explanation as to why this is a thing.
-     */
-    WSProxy *proxy;
-
-    /**
      * @brief Listens for incoming TCP connections.
      */
     QTcpServer *server;
+
+    /**
+     * @brief Listens for incoming Websocket connections.
+     */
+    QWebSocketServer *ws_server;
 
     /**
      * @brief Handles Discord webhooks.

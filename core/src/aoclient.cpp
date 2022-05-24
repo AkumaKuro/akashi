@@ -149,16 +149,16 @@ const QMap<QString, AOClient::CommandInfo> AOClient::COMMANDS{
 
 void AOClient::clientData()
 {
-    if (last_read + m_socket->bytesAvailable() > 30720) { // Client can send a max of 30KB to the server over two sequential reads
-        m_socket->close();
+    if (last_read + m_socket.tcp->bytesAvailable() > 30720) { // Client can send a max of 30KB to the server over two sequential reads
+        m_socket.tcp->close();
     }
 
     if (last_read == 0) { // i.e. this is the first packet we've been sent
-        if (!m_socket->waitForConnected(1000)) {
-            m_socket->close();
+        if (!m_socket.tcp->waitForConnected(1000)) {
+            m_socket.tcp->close();
         }
     }
-    QString l_data = QString::fromUtf8(m_socket->readAll());
+    QString l_data = QString::fromUtf8(m_socket.tcp->readAll());
     last_read = l_data.size();
 
     if (is_partial) {
@@ -175,6 +175,10 @@ void AOClient::clientData()
         AOPacket l_packet(l_single_packet);
         handlePacket(l_packet);
     }
+}
+
+void AOClient::ws_clientData(QString f_data)
+{
 }
 
 void AOClient::clientDisconnected()
@@ -437,8 +441,8 @@ void AOClient::sendPacket(AOPacket packet)
         .replaceInStrings("$", "<dollar>");
     if (packet.header != "LE")
         packet.contents.replaceInStrings("&", "<and>");
-    m_socket->write(packet.toUtf8());
-    m_socket->flush();
+    m_socket.tcp->write(packet.toUtf8());
+    m_socket.tcp->flush();
 }
 
 void AOClient::sendPacket(QString header, QStringList contents)
@@ -550,18 +554,46 @@ AOClient::AOClient(Server *p_server, QTcpSocket *p_socket, QObject *parent, int 
     m_joined(false),
     m_current_area(0),
     m_current_char(""),
-    m_socket(p_socket),
+    m_socket_type(DataTypes::SocketType::TCP),
     server(p_server),
     is_partial(false),
     m_last_wtce_time(0),
     m_music_manager(p_manager)
 {
+    m_socket.tcp = p_socket;
     m_afk_timer = new QTimer;
     m_afk_timer->setSingleShot(true);
     connect(m_afk_timer, &QTimer::timeout, this, &AOClient::onAfkTimeout);
+    connect(m_socket.tcp, &QTcpSocket::readyRead, this, &AOClient::clientData);
+}
+
+AOClient::AOClient(Server *p_server, QWebSocket *p_socket, QObject *parent, int user_id, MusicManager *p_manager) :
+    QObject(parent),
+    m_id(user_id),
+    m_remote_ip(p_socket->peerAddress()),
+    m_password(""),
+    m_joined(false),
+    m_current_area(0),
+    m_current_char(""),
+    m_socket_type(DataTypes::SocketType::WEBSOCKET),
+    server(p_server),
+    is_partial(false),
+    m_last_wtce_time(0),
+    m_music_manager(p_manager)
+{
+    m_socket.ws = p_socket;
+    m_afk_timer = new QTimer;
+    m_afk_timer->setSingleShot(true);
+    connect(m_afk_timer, &QTimer::timeout, this, &AOClient::onAfkTimeout);
+    connect(m_socket.ws, &QWebSocket::textMessageReceived, this, &AOClient::ws_clientData);
 }
 
 AOClient::~AOClient()
 {
-    m_socket->deleteLater();
+    if (m_socket_type == DataTypes::SocketType::TCP) {
+        m_socket.tcp->deleteLater();
+    }
+    else {
+        m_socket.ws->deleteLater();
+    }
 }

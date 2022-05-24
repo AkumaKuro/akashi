@@ -38,10 +38,6 @@ Server::Server(int p_port, int p_ws_port, QObject *parent) :
 {
     server = new QTcpServer(this);
     connect(server, SIGNAL(newConnection()), this, SLOT(clientConnected()));
-
-    proxy = new WSProxy(port, ws_port, this);
-    if (ws_port != -1)
-        proxy->start();
     timer = new QTimer(this);
 
     db_manager = new DBManager;
@@ -548,7 +544,7 @@ Server::~Server()
         l_client->deleteLater();
     }
     server->deleteLater();
-    proxy->deleteLater();
+    ws_server->deleteLater();
     discord->deleteLater();
     acl_roles_handler->deleteLater();
 

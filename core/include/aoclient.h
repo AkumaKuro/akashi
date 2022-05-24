@@ -29,9 +29,11 @@
 #if QT_VERSION > QT_VERSION_CHECK(5, 10, 0)
 #include <QRandomGenerator>
 #endif
+#include <QWebSocket>
 
 #include "include/acl_roles_handler.h"
 #include "include/aopacket.h"
+#include "include/data_types.h"
 
 class AreaData;
 class DBManager;
@@ -84,8 +86,20 @@ class AOClient : public QObject
      * @param p_socket The socket associated with the AOClient.
      * @param user_id The user ID of the client.
      * @param parent Qt-based parent, passed along to inherited constructor from QObject.
+     * @param p_manager Pointer to the servers music handler.
      */
     AOClient(Server *p_server, QTcpSocket *p_socket, QObject *parent = nullptr, int user_id = 0, MusicManager *p_manager = nullptr);
+
+    /**
+     * @brief Creates an instance of the AOClient class.
+     *
+     * @param p_server A pointer to the Server instance where the client is joining to.
+     * @param p_socket The socket associated with the AOClient.
+     * @param user_id The user ID of the client.
+     * @param parent Qt-based parent, passed along to inherited constructor from QObject.
+     * @param p_manager Pointer to the servers music handler.
+     */
+    AOClient(Server *p_server, QWebSocket *p_socket, QObject *parent = nullptr, int user_id = 0, MusicManager *p_manager = nullptr);
 
     /**
      * @brief Destructor for the AOClient instance.
@@ -366,6 +380,13 @@ class AOClient : public QObject
     void clientData();
 
     /**
+     * @brief A slot for when a websocket client sends data to the server.
+     *
+     * @param f_data The data received from the websocket.
+     */
+    void ws_clientData(QString f_data);
+
+    /**
      * @brief A slot for sending a packet to the client.
      *
      * @param packet The packet to send.
@@ -397,7 +418,15 @@ class AOClient : public QObject
     /**
      * @brief The TCP socket used to communicate with the client.
      */
-    QTcpSocket *m_socket;
+    union {
+        QWebSocket *ws;
+        QTcpSocket *tcp;
+    } m_socket;
+
+    /**
+     * @brief The socket type assigned to this client.
+     */
+    DataTypes::SocketType m_socket_type;
 
     /**
      * @brief A pointer to the Server, used for updating server variables that depend on the client (e.g. amount of players in an area).

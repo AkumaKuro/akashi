@@ -44,8 +44,6 @@ SOURCES += \
     src/packets.cpp \
     src/server.cpp \
     src/testimony_recorder.cpp \
-    src/ws_client.cpp \
-    src/ws_proxy.cpp \
     src/advertiser.cpp \
     src/logger/u_logger.cpp \
     src/logger/writer_modcall.cpp \
@@ -64,8 +62,6 @@ HEADERS += include/aoclient.h \
     include/discord.h \
     include/server.h \
     include/typedefs.h \
-    include/ws_client.h \
-    include/ws_proxy.h \
     include/advertiser.h \
     include/logger/u_logger.h \
     include/logger/writer_modcall.h \

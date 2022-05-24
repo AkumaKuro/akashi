@@ -48,6 +48,13 @@ class DataTypes
         FULLAREA
     };
     Q_ENUM(LogType)
+
+    enum class SocketType
+    {
+        TCP,
+        WEBSOCKET
+    };
+    Q_ENUM(SocketType)
 };
 
 template <typename T>
