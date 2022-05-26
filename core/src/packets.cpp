@@ -33,7 +33,7 @@ void AOClient::pktDefault(AreaData *area, int argc, QStringList argv, AOPacket p
     Q_UNUSED(argc);
     Q_UNUSED(argv);
 #ifdef NET_DEBUG
-    qDebug() << "Unimplemented packet:" << packet.header << packet.contents;
+    qDebug() << "Unimplemented packet:" << packet.getHeader() << packet.getContent();
 #else
     Q_UNUSED(packet);
 #endif
@@ -104,7 +104,7 @@ void AOClient::pktSoftwareId(AreaData *area, int argc, QStringList argv, AOPacke
 
     if (m_version.release != 2) {
         // No valid ID packet resolution.
-        sendPacket(AOPacket("BD", {"A protocol error has been encountered. Packet : ID"}));
+        sendPacket(AOPacket("BD", {"A protocol error has been encountered. Packet : ID\nMajor version not recognised."}));
         m_socket->close();
         return;
     }
@@ -247,15 +247,15 @@ void AOClient::pktIcChat(AreaData *area, int argc, QStringList argv, AOPacket pa
     }
 
     AOPacket validated_packet = validateIcPacket(packet);
-    if (validated_packet.header == "INVALID")
+    if (validated_packet.getHeader() == "INVALID")
         return;
 
     if (m_pos != "")
-        validated_packet.contents[5] = m_pos;
+        validated_packet.setContentField(5, m_pos);
 
     server->broadcast(validated_packet, m_current_area);
     emit logIC((m_current_char + " " + m_showname), m_ooc_name, m_ipid, server->getAreaById(m_current_area)->name(), m_last_message);
-    area->updateLastICMessage(validated_packet.contents);
+    area->updateLastICMessage(validated_packet.getContent());
 
     area->startMessageFloodguard(ConfigManager::messageFloodguard());
     server->startMessageFloodguard(ConfigManager::globalMessageFloodguard());
@@ -502,8 +502,8 @@ void AOClient::pktModCall(AreaData *area, int argc, QStringList argv, AOPacket p
 
     QString l_modcallNotice = "!!!MODCALL!!!\nArea: " + l_areaName + "\nCaller: " + l_name + "\n";
 
-    if (!packet.contents[0].isEmpty())
-        l_modcallNotice.append("Reason: " + packet.contents[0]);
+    if (!packet.getContent()[0].isEmpty())
+        l_modcallNotice.append("Reason: " + packet.getContent()[0]);
     else
         l_modcallNotice.append("No reason given.");
 
@@ -520,7 +520,7 @@ void AOClient::pktModCall(AreaData *area, int argc, QStringList argv, AOPacket p
             l_name = m_current_char;
 
         QString l_areaName = area->name();
-        emit server->modcallWebhookRequest(l_name, l_areaName, packet.contents[0], server->getAreaBuffer(l_areaName));
+        emit server->modcallWebhookRequest(l_name, l_areaName, packet.getContent().value(0), server->getAreaBuffer(l_areaName));
     }
 }
 
@@ -694,7 +694,7 @@ AOPacket AOClient::validateIcPacket(AOPacket packet)
         return l_invalid;
 
     QList<QVariant> l_incoming_args;
-    for (const QString &l_arg : qAsConst(packet.contents)) {
+    for (const QString &l_arg : packet.getContent()) {
         l_incoming_args.append(QVariant(l_arg));
     }
 
