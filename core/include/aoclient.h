@@ -1375,6 +1375,15 @@ class AOClient : public QObject
      */
     void cmdClearCM(int argc, QStringList argv);
 
+    /**
+     * @brief Removes all other clients of the user except for the user.
+     *
+     * @details This command can be used to disconnect ghosting clients that improperly disconnected from the server.
+     *
+     * @iscommand
+     */
+    void cmdKickother(int argc, QStringList argv);
+
     ///@}
 
     /**

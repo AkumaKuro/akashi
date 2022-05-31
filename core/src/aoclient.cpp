@@ -145,7 +145,8 @@ const QMap<QString, AOClient::CommandInfo> AOClient::COMMANDS{
     {"toggleroot", {{ACLRole::CM}, 0, &AOClient::cmdToggleRootlist}},
     {"clearcustom", {{ACLRole::CM}, 0, &AOClient::cmdClearCustom}},
     {"togglewtce", {{ACLRole::CM}, 0, &AOClient::cmdToggleWtce}},
-    {"toggleshouts", {{ACLRole::CM}, 0, &AOClient::cmdToggleShouts}}};
+    {"toggleshouts", {{ACLRole::CM}, 0, &AOClient::cmdToggleShouts}},
+    {"kickother", {{ACLRole::NONE}, 0, &AOClient::cmdKickother}}};
 
 void AOClient::clientData()
 {

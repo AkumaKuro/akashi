@@ -630,3 +630,25 @@ void AOClient::cmdClearCM(int argc, QStringList argv)
     arup(ARUPType::CM, true);
     sendServerMessage("Removed all CMs from this area.");
 }
+
+void AOClient::cmdKickother(int argc, QStringList argv)
+{
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
+
+    QList<AOClient *> l_invoker_clients = server->getClientsByIpid(m_ipid);
+
+    int l_clients_kicked = 0;
+
+    for ( AOClient* l_client : l_invoker_clients ) {
+
+        if(l_client->m_id != m_id){
+            l_client->m_socket->close();
+            l_clients_kicked++;
+        }
+
+    }
+
+    sendServerMessage("You removed " + QString::number(l_clients_kicked) + " of your clients.");
+
+}
