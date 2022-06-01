@@ -649,6 +649,6 @@ void AOClient::cmdKickother(int argc, QStringList argv)
 
     }
 
-    sendServerMessage("You removed " + QString::number(l_clients_kicked) + " of your clients.");
+    sendServerMessage(QString::number(l_clients_kicked) + " multiclients have been removed.");
 
 }
