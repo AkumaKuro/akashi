@@ -640,9 +640,9 @@ void AOClient::cmdKickother(int argc, QStringList argv)
 
     int l_clients_kicked = 0;
 
-    for ( AOClient* l_client : l_invoker_clients ) {
+    for (AOClient *l_client : l_invoker_clients) {
 
-        if(l_client->m_id != m_id){
+        if (l_client->m_id != m_id){
             l_client->m_socket->close();
             l_clients_kicked++;
         }
@@ -650,5 +650,4 @@ void AOClient::cmdKickother(int argc, QStringList argv)
     }
 
     sendServerMessage(QString::number(l_clients_kicked) + " multiclients have been removed.");
-
 }
